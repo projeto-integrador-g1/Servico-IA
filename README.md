@@ -10,7 +10,7 @@ número entre -1 e 1 representando os diferentes estados de uma plantação (ban
 ## Google Colab
 O projeto foi executado no Google Colab devido a capacidade de processamento disponibilizado pelo Google.
 
-Para rodar no google [Colab](https://colab.research.google.com/drive/1oLuDwMBRHBWYXFX21G68pyOSfyFyqOZb?usp=sharing) é necessário fazer download dos arquivos LEM_shapefile.zip e do [dataset](https://drive.google.com/open?id=14daAWOO7z0XD3ljgl8dDxfAyZSMSs_nD) já processado
+Para rodar no google **[Colab](https://colab.research.google.com/drive/1oLuDwMBRHBWYXFX21G68pyOSfyFyqOZb?usp=sharing)** é necessário fazer download dos arquivos LEM_shapefile.zip e do **[dataset](https://drive.google.com/open?id=14daAWOO7z0XD3ljgl8dDxfAyZSMSs_nD)** já processado
 
 
 
