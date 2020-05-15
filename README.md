@@ -8,4 +8,4 @@ número entre -1 e 1 representando os diferentes estados de uma plantação (ban
 
 ## Shapefile 
 
-
+https://gitlab.com/projeto-integrador-fatec/servico-ia/-/blob/master/imagens/shapefile.png
