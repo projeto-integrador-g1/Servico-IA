@@ -1,7 +1,7 @@
 from flask import Flask, request
 from imgurpython import ImgurClient
 from tensorflow import keras
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 import numpy as np
 import pandas as pd
 import rasterio
@@ -56,6 +56,7 @@ def upload(file):
 
 def predict(x):
     model = load_model('modelo.h5')
+    print(model.summary())
     preds = model.predict(x)
 
     img_out = []
@@ -76,7 +77,5 @@ def eps(n):
   return n > 0.018
   # return n > 0.045
 
-
-
 if __name__ == "__main__":
-    app.run(port=8922,  threaded=False, debug=True)
+    app.run(port=8922, debug=True)
