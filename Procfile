@@ -1,0 +1,1 @@
+web: python servico_ia.py run

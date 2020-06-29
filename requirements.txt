@@ -1,0 +1,8 @@
+flask
+imgurpython
+tensorflow
+numpy
+pandas
+rasterio
+requests
+matplotlib
