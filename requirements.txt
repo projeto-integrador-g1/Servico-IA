@@ -3,6 +3,6 @@ imgurpython
 tensorflow
 numpy
 pandas
-rasterio
+boto3
 requests
 matplotlib
