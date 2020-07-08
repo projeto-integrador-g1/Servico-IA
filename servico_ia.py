@@ -1,49 +1,51 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from imgurpython import ImgurClient
-from tensorflow import keras
-from tensorflow.keras.models import load_model
+from crop import cropImg, reprojectA
+import json
+#from tensorflow import keras
+#from tensorflow.keras.models import load_model
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import rasterio
+from flask_cors import CORS
 import requests
 import matplotlib.pyplot as plt
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/ia')
+@app.route('/ia', methods=['POST'])
 def ia():
+    print('chegou aqui')
     body = request.get_json()
+    print(body[0])
+    for item in body[1:]:
+        print(item['assets']['B8']['href'])
+        r = requests.get(item['assets']['B8']['href'])
+        if r.status_code == 200:
+            f = open(item['_id'] + ".tif", "wb")
+            f.write(r.content)
+            f.close()
+            reprojectA(item['_id'])
+            cropImg(body[0])
+    
+    
    # lat = body['lat']
    # lon = body['lon']
     #geo = body['geo']
-    bandas = dict.fromkeys(['B02', 'B03', 'B04', 'B08'])
-    df = pd.DataFrame()
-    for b in bandas.keys():
-        bandas[b] = requests.get('http://services.sentinel-hub.com/ogc/wms/8cbb4249-c380-4033-9616-5ae31e75b8b9?REQUEST=GetMap&LAYERS={}&MAXCC=20&WIDTH=300&HEIGHT=300&FORMAT=image/tiff&TIME=2020-01-01&GEOMETRY=POLYGON((-23.49827102335408%20-48.17391096004957,%20-23.522711137062757%20-48.1737192145292,%20-23.522183700485243%20-48.12175617862559,%20-23.495809177809207%20-48.120222214466594,%20-23.49827102335408%20-48.17391096004957))&CRS=EPSG:4326&BGCOLOR=000000'.format(b))
-        
-        if bandas[b].status_code == 200:
-            f = open(b + ".tiff", "wb")
-            f.write(bandas[b].content)
-            f.close()
     
 
     #print(rasterio.open("B02.tiff").profile)
-    
-    in_b02 = rasterio.open("B02.tiff").read(1).flatten() / 20001
-    in_b03 = rasterio.open("B03.tiff").read(1).flatten() / 19969
-    in_b04 = rasterio.open("B04.tiff").read(1).flatten() / 22426
-    in_b08 = rasterio.open("B08.tiff").read(1).flatten() / 33128
-    in_ndvi = np.subtract(in_b08, in_b04)/ np.add(in_b08, in_b04)
-    in_ndvi = np.nan_to_num(in_ndvi)
-
-    x = [] 
-
-    for i in range(0,300):
-        x.append([in_b02[i], in_b03[i], in_b04[i], in_b08[i], in_ndvi[i]])
-
-    x = np.array(x)
-    img_id = predict(x)
-
-    return img_id, 200 
+    imgs_ids=[]
+    for item in body[1:]:
+        test = rasterio.open("cropped" + ".tif").read(1)
+        plt.imshow(test)
+        plt.show()
+        spec = plt.imshow(test)
+        plt.savefig(item['_id'] + '.png', bbox_inches='tight', pad_inches=0)
+        img_id = upload(item['_id'] + '.png')
+        imgs_ids.append(img_id)
+    print(imgs_ids)
+    return imgs_ids, 200 
 
 
 def upload(file):

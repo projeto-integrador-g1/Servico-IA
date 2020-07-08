@@ -1,67 +1,57 @@
-import fiona
+#import fiona
 import rasterio
 import rasterio.mask
 import json
 import matplotlib.pyplot as plt
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 
-geoms = [{
-    "type": "FeatureCollection",
-    "crs": {
-        "type": "name",
-        "properties": {
-            "name": "EPSG:32622"
-        }
-    },
-    "features": [
-        {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
+def cropImg(coord):
+    geoms = [{
                 "type": "Polygon",
-                "coordinates": [[
-                    (
-                        -50.48751719782649,
-                        -16.404813405303997
-                    ),
-                    (
-                        -50.467370502876435,
-                        -16.423333779750436
-                    ),
-                    (
-                        -50.50027677129552,
-                        -16.440081120831323
-                    ),
-                    (
-                        -50.520407933302636,
-                        -16.417352893554707
-                    ),
-                    (
-                        -50.48751719782649,
-                        -16.404813405303997
-                    )
-                ]]
-            }
-        }
-    ]
-}]
+                "coordinates": [
+                    [[-40.98167561648731, -9.235799733189367], [-40.94014730150366, -9.235501262559865], [-40.94004650462216, -9.263357430947423], [-40.98288517905988, -9.26395432469262], [-40.98167561648731, -9.235799733189367]]
+                    ]
+    }]
 
-with fiona.open("A:\Bruno\Documents\Faculdade\Projeto-Intergador\Servico-IA\layers\POLYGON.shp", "r") as shapefile:
-    shapes = [feature["geometry"] for feature in shapefile]
+    with rasterio.open(r"C:\Users\mathe\Servico-IA\reprojected.tif") as src:
+        out_image, out_transform = rasterio.mask.mask(
+            src, geoms, crop=True)
+        out_meta = src.meta
 
-with rasterio.open("A:\Bruno\Documents\Faculdade\Projeto-Intergador\Servico-IA\LC08_L1TP_222071_20180429_20180502_01_T1_B2.tif", "r") as src:
-    out_image, out_transform = rasterio.mask.mask(
-        src, shapes)
-    out_meta = src.meta
+    out_meta.update({"driver": "GTiff",
+                    "height": out_image.shape[1],
+                    "width": out_image.shape[2],
+                    "transform": out_transform})
 
-out_meta.update({"driver": "GTiff",
-                 "height": out_image.shape[1],
-                 "width": out_image.shape[2],
-                 "transform": out_transform})
-
-with rasterio.open("RGB.byte.masked.tif", "w", **out_meta) as dest:
-    dest.write(out_image)
+    with rasterio.open("cropped.tif", "w", **out_meta) as dest:
+        dest.write(out_image)
     
     
-var = rasterio.open("RGB.byte.masked.tif")
-plt.imshow(var.read(1))
-plt.show()
+
+
+
+
+def reprojectA(id):
+    dst_crs = 'EPSG:4326'
+    with rasterio.open('C:/Users/mathe/Servico-IA/'+ id +'.tif') as src:
+        transform, width, height = calculate_default_transform(
+            src.crs, dst_crs, src.width, src.height, *src.bounds)
+        kwargs = src.meta.copy()
+        kwargs.update({
+            'crs': dst_crs,
+            'transform': transform,
+            'width': width,
+            'height': height
+        })
+        with rasterio.open('reprojected.tif', 'w', **kwargs) as dst:
+            for i in range(1, src.count + 1):
+                reproject(
+                    source=rasterio.band(src, i),
+                    destination=rasterio.band(dst, i),
+                    src_transform=src.transform,
+                    src_crs=src.crs,
+                    dst_transform=transform,
+                    dst_crs=dst_crs,
+                    resampling=Resampling.nearest)
+
+
