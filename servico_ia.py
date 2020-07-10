@@ -19,25 +19,20 @@ def ia():
     body = request.get_json()
     print(body[0])
     for item in body[1:]:
-        print(item['assets']['B8']['href'])
+        print("baixando ", item['assets']['B8']['href'])
         r = requests.get(item['assets']['B8']['href'])
         if r.status_code == 200:
             f = open(item['_id'] + ".tif", "wb")
+            print("baixando")
             f.write(r.content)
             f.close()
             reprojectA(item['_id'])
-            cropImg(body[0])
+            cropImg(body[0], item['_id'])
     
     
-   # lat = body['lat']
-   # lon = body['lon']
-    #geo = body['geo']
-    
-
-    #print(rasterio.open("B02.tiff").profile)
     imgs_ids=[]
     for item in body[1:]:
-        test = rasterio.open("cropped" + ".tif").read(1)
+        test = rasterio.open("cropped"+ item["_id"] + ".tif").read(1)
         plt.imshow(test)
         plt.show()
         spec = plt.imshow(test)
@@ -45,7 +40,9 @@ def ia():
         img_id = upload(item['_id'] + '.png')
         imgs_ids.append(img_id)
     print(imgs_ids)
-    return imgs_ids, 200 
+    res = {}
+    res['links'] = imgs_ids
+    return res, 200 
 
 
 def upload(file):

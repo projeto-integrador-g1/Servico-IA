@@ -5,7 +5,7 @@ import json
 import matplotlib.pyplot as plt
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 
-def cropImg(coord):
+def cropImg(coord, id):
     geoms = [{
                 "type": "Polygon",
                 "coordinates": [
@@ -13,7 +13,7 @@ def cropImg(coord):
                 ]
     }]
 
-    with rasterio.open(r"C:\Users\mathe\Servico-IA\reprojected.tif") as src:
+    with rasterio.open("reprojected.tif") as src:
         out_image, out_transform = rasterio.mask.mask(
             src, geoms, crop=True)
         out_meta = src.meta
@@ -23,7 +23,7 @@ def cropImg(coord):
                     "width": out_image.shape[2],
                     "transform": out_transform})
 
-    with rasterio.open("cropped.tif", "w", **out_meta) as dest:
+    with rasterio.open(f"cropped{id}.tif", "w", **out_meta) as dest:
         dest.write(out_image)
     
     
@@ -33,7 +33,7 @@ def cropImg(coord):
 
 def reprojectA(id):
     dst_crs = 'EPSG:4326'
-    with rasterio.open('C:/Users/mathe/Servico-IA/'+ id +'.tif') as src:
+    with rasterio.open(id +'.tif') as src:
         transform, width, height = calculate_default_transform(
             src.crs, dst_crs, src.width, src.height, *src.bounds)
         kwargs = src.meta.copy()
