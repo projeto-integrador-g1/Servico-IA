@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify
 from imgurpython import ImgurClient
 from crop import cropImg, reprojectA
 import json
-#from tensorflow import keras
-#from tensorflow.keras.models import load_model
+from tensorflow import keras
+from tensorflow.keras.models import load_model
 import numpy as np
 #import pandas as pd
 import rasterio
@@ -32,16 +32,11 @@ def ia():
     
     imgs_ids=[]
     for item in body[1:]:
-        raster = rasterio.open("cropped"+ item["_id"] + ".tif").read(1)
+        raster = rasterio.open("cropped"+ item["_id"] + ".tif")
         w = raster.width
         h = raster.height
-        plt.imshow(test)
-        plt.show()
-        predicted = predict(raster)
-        sh_preds = np.reshape(predicted, (h,w))
-        spec = plt.imshow(sh_preds)
-        plt.savefig(item['_id'] + '.png', bbox_inches='tight', pad_inches=0)
-        img_id = upload(item['_id'] + '.png')
+        raster = raster.read(1)
+        img_id = predict(raster, h, w)
         imgs_ids.append(img_id)
     print(imgs_ids)
     res = {}
@@ -57,17 +52,14 @@ def upload(file):
     image = client.upload_from_path(file)
     return image['link']
 
-def predict(x):
+def predict(x, h, w):
     model = load_model('modelo.h5')
     
+    x = x.flatten()
     preds = model.predict(x)
-
+    print(preds)   
     sh_preds = np.reshape(preds, (h,w))
-
-    plt.imshow(img_out)
-    plt.show()
-
-    spec = plt.imshow(img_out)
+    spec = plt.imshow(sh_preds)
     plt.savefig('image.png', bbox_inches='tight', pad_inches=0)
     img_id = upload('image.png')
 
