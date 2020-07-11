@@ -56,7 +56,9 @@ def predict(x, h, w):
     model = load_model('modelo.h5')
     
     x = x.flatten()
+    x = x / 10000
     preds = model.predict(x)
+
     print(preds)   
     sh_preds = np.reshape(preds, (h,w))
     spec = plt.imshow(sh_preds)
