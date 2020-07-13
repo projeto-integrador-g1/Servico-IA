@@ -19,8 +19,8 @@ def ia():
     body = request.get_json()
     print(body[0])
     for item in body[1:]:
-        print("baixando ", item['assets']['B8']['href'])
-        r = requests.get(item['assets']['B8']['href'])
+        print("baixando ", item['assets']['B5']['href'])
+        r = requests.get(item['assets']['B5']['href'])
         if r.status_code == 200:
             f = open(item['_id'] + ".tif", "wb")
             print("baixando")
