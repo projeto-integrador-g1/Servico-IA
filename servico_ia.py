@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/ia', methods=['POST'])
 def ia():
     print('chegou aqui')
@@ -28,11 +29,10 @@ def ia():
             f.close()
             reprojectA(item['_id'])
             cropImg(body[0], item['_id'])
-    
-    
-    imgs_ids=[]
+
+    imgs_ids = []
     for item in body[1:]:
-        raster = rasterio.open("cropped"+ item["_id"] + ".tif")
+        raster = rasterio.open("cropped" + item["_id"] + ".tif")
         w = raster.width
         h = raster.height
         raster = raster.read(1)
@@ -41,7 +41,7 @@ def ia():
     print(imgs_ids)
     res = {}
     res['links'] = imgs_ids
-    return res, 200 
+    return res, 200
 
 
 def upload(file):
@@ -52,15 +52,22 @@ def upload(file):
     image = client.upload_from_path(file)
     return image['link']
 
+
 def predict(x, h, w):
     model = load_model('modelo.h5')
-    
+
     x = x.flatten()
     x = x / 10000
-    preds = model.predict(x)
+    preds = model.predict(x, batch_size=128000)
+    
+    mean = np.mean(preds)
+    # print(mean)
+    #print(np.unique(preds, return_counts=True))
+    sh_preds = np.reshape(preds, (h, w))
+    a = np.where(sh_preds > mean, 1, 0)
 
-    print(preds)   
-    sh_preds = np.reshape(preds, (h,w))
+    print(preds)
+    sh_preds = np.reshape(preds, (h, w))
     spec = plt.imshow(sh_preds)
     plt.savefig('image.png', bbox_inches='tight', pad_inches=0)
     img_id = upload('image.png')
