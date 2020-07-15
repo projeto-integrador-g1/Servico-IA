@@ -5,7 +5,7 @@ numpy
 requests
 matplotlib
 flask-cors
-gdal
+GDAL
 fiona
 rasterio
 tensorflow
