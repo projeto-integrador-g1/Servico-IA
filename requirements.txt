@@ -1,9 +1,11 @@
 flask
 imgurpython
-tensorflow
+keras
 numpy
-pandas
-boto3
 requests
 matplotlib
 flask-cors
+https://download.lfd.uci.edu/pythonlibs/w3jqiv8s/GDAL-3.1.2-cp37-cp37m-win_amd64.whl
+https://download.lfd.uci.edu/pythonlibs/w3jqiv8s/rasterio-1.1.5-cp37-cp37m-win_amd64.whl
+https://download.lfd.uci.edu/pythonlibs/w3jqiv8s/Fiona-1.8.13-cp37-cp37m-win_amd64.whl
+tensorflow
